@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-import 'src/vendor/three-vreffect';
-import 'src/vendor/three-vrcontrols';
-import 'webvr-polyfill';
+import VrEnvironment from './VrEnvironment';
+import window from 'src/window';
 
 /* Uncomment once shape.ts exists:
 import { Shape } from 'src/shape.ts';*/
@@ -14,8 +13,7 @@ export class World {
   private scene : THREE.Scene;
   private camera : THREE.PerspectiveCamera;
   private renderer : THREE.WebGLRenderer;
-  private effect: THREE.VREffect;
-  private controls: THREE.VRControls;
+  private vrEnvironment: VrEnvironment;
 
   // Each World will also keep track of what shapes are currently in it:
   // NOTE: This is a private member.
@@ -23,7 +21,6 @@ export class World {
   private shapes : Array<Shape>;*/
 
   constructor() {
-
     // Basic set up of scene, camera, and renderer:
     this.scene = new THREE.Scene();
 
@@ -33,37 +30,9 @@ export class World {
       window.innerWidth / window.innerHeight, 0.1, 1000 );
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setSize( window.innerWidth, window.innerHeight );
-    console.log(THREE);
-    this.effect = new THREE.VREffect(this.renderer);
-    this.effect.setSize(window.innerWidth, window.innerHeight);
-    this.controls = new THREE.VRControls(this.camera);
-
-    const makeCube = (x: number, y: number, z: number) => {
-      const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-      const cube = new THREE.Mesh( geometry, material );
-      cube.position.z = z;
-      cube.position.y = y;
-      cube.position.x = x;
-
-      this.scene.add(cube);
-    }
-    // Add to HTML:
-    document.body.appendChild( this.renderer.domElement );
-
-
-
-    makeCube(5, 0, 0);
-    makeCube(0, 5, 0);
-    makeCube(0, 0, 5);
-    makeCube(-5, 0, 0);
-    makeCube(0, -5, 0);
-    makeCube(0, 0, -5);
-
-
-    this.render();
-
+    this.vrEnvironment = new VrEnvironment(this.renderer, this.camera, this.scene);
+    this.vrEnvironment.init();
+    this.vrEnvironment.setSize(window.innerWidth, window.innerHeight);
   }
 
   // Public methods:
@@ -77,10 +46,21 @@ export class World {
     this.shapes.push(Shape);
   }*/
 
-  // Render world:
-  render = () => {
-    requestAnimationFrame( this.render );
-    this.controls.update();
-    this.effect.render(this.scene, this.camera);
+  /**
+   * Update the objects in the world
+   */
+  update(delta: number) {
+    // Do something
+  }
+
+  /**
+   * Start rendering and updating the world
+   */
+  start() {
+    window.document.body.appendChild(this.renderer.domElement);
+
+    this.vrEnvironment
+      .createAnimator(delta => this.update(delta))
+      .start();
   }
 }

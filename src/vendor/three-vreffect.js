@@ -11,7 +11,7 @@ var THREE = require('three');
  *
  */
 
-THREE.VREffect = function( renderer, onError ) {
+var VREffect = exports.VREffect = function( renderer, onError ) {
 
 	var vrDisplay, vrDisplays;
 	var eyeTranslationL = new THREE.Vector3();

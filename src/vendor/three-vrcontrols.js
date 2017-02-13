@@ -5,7 +5,7 @@ var THREE = require('three');
  * @author mrdoob / http://mrdoob.com
  */
 
-THREE.VRControls = function ( object, onError ) {
+var VRControls = exports.VRControls = function ( object, onError ) {
 
 	var scope = this;
 
